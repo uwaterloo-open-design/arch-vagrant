@@ -40,7 +40,19 @@
     {
       "type": "shell",
       "inline": [
-        "echo 'did it!'"
+        "echo 'Make filesystems.'",
+        "mkfs.btrfs /dev/sda1",
+        "mkfs.btrfs /dev/sda2"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Mount virtual drives'",
+        "mkdir -p /mnt",
+        "mount /dev/sda2 /mnt",
+        "mkdir -p /mnt/boot",
+        "mount /dev/sda1 /mnt/boot"
       ]
     }
   ]
