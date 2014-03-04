@@ -11,7 +11,7 @@
     "ssh_wait_timeout": "50000s",
     "boot_wait": "5s",
     "boot_command": [
-      "<enter><wait10>",
+      "<enter><wait10><wait5>",
       "echo 'Setting up SSH access for Packer'<enter>",
       "vi /etc/ssh/sshd_config <enter>",
         "<esc>/PermitRootLogin<enter><esc>^x",
