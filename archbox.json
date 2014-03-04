@@ -1,0 +1,35 @@
+{
+  "variables": {},
+  "builders": [{
+    "type": "virtualbox-iso",
+    "guest_os_type": "ArchLinux_64",
+    "iso_url": "templates/base.iso",
+    "iso_checksum": "d0c93ab40c4fd8959bfb5c7e5989c777",
+    "iso_checksum_type": "md5",
+    "ssh_username": "root",
+    "ssh_password": "",
+    "ssh_wait_timeout": "50000s",
+    "boot_command": [
+      "<enter><wait10><wait><wait>",
+      "pacman -Syy --noconfirm <enter>",
+        "<wait10><wait10>",
+      "vi /etc/ssh/sshd_config <enter>",
+        "<esc>/PermitRootLogin<enter><esc>^x",
+        "<esc>/PermitEmptyPasswords<enter><esc>^x$xxayes<esc>",
+        "<esc>:wq<enter>",
+        "<wait5>",
+      "systemctl restart sshd.service <enter>",
+        "<wait10><wait10>"
+
+    ],
+    "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now"
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'did it!'"
+      ]
+    }
+  ]
+}
