@@ -12,7 +12,7 @@
     "boot_wait": "5s",
     "boot_command": [
       "<enter><wait10><wait5>",
-      "echo 'Setting up SSH access for Packer'<enter>",
+      "#Setting up SSH access for Packer<enter>",
       "vi /etc/ssh/sshd_config <enter>",
         "<esc>/PermitRootLogin<enter><esc>^x",
         "<esc>/PermitEmptyPasswords<enter><esc>^x$xxayes<esc>",
@@ -20,7 +20,7 @@
         "<wait>",
       "systemctl restart sshd.service <enter>",
         "<wait>",
-      "echo 'Configuring 1GB boot partition and 40GB root/home partition'<enter>",
+      "#Configuring 1GB boot partition and 40GB root/home partition<enter>",
       "cfdisk /dev/sda <enter>",
         "<enter><enter>",
         "1000<enter>",
@@ -54,6 +54,74 @@
         "mkdir -p /mnt/boot",
         "mount /dev/sda1 /mnt/boot"
       ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Bootstrap the base system'",
+        "pacstrap /mnt base base-devel"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Generate an fstab'",
+        "genfstab -U -p /mnt >> /mnt/etc/fstab"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Setting locale information'",
+        "echo 'en_US.UTF-8 UTF-8' > /mnt/etc/locale.gen",
+        "arch-chroot /mnt locale-gen",
+        "echo LANG=en_US.UTF-8 > /etc/locale.conf"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Set the HW Clock'",
+        "arch-chroot /mnt hwclock --systohc --utc"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Set up the initial RAMdisk'",
+        "arch-chroot /mnt mkinitcpio -p linux || exit 0"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Ensure dhcpcd starts on boot'",
+        "arch-chroot /mnt systemctl enable dhcpcd.service"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo Set root password to 'password'",
+        "arch-chroot /mnt echo root:password | chpasswd"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Install bootloader'",
+        "arch-chroot /mnt pacman --noconfirm -S syslinux",
+        "arch-chroot /mnt syslinux-install_update -i -a -m"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "reboot"
+      ]
     }
+  ],
+  "post-processors": [
+    "vagrant"
   ]
 }
