@@ -113,12 +113,6 @@
         "arch-chroot /mnt pacman --noconfirm -S syslinux",
         "arch-chroot /mnt syslinux-install_update -i -a -m"
       ]
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "reboot"
-      ]
     }
   ],
   "post-processors": [
