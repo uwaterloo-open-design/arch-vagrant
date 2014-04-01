@@ -32,7 +32,7 @@ end
 
 namespace :packer do
   task :gen do
-    system 'rm boxes/arch-raw.box'
-    system 'packer build -force archbox.json -o boxes/arch-raw.box'
+    system 'rm -f boxes/arch-raw.box'
+    system 'packer build archbox.json'
   end
 end
