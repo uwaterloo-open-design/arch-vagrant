@@ -51,4 +51,6 @@ echo 'Fix syslinux config'
 sed s/sda3/sda2/ /boot/syslinux/syslinux.cfg > /tmp/syslinux.cfg
 mv /tmp/syslinux.cfg /boot/syslinux/syslinux.cfg
 
+echo 'add vagrant to the sudoers list'
+echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 SCRIPT
