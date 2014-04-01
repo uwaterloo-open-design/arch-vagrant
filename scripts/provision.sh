@@ -27,7 +27,7 @@ echo 'Set the HW Clock'
 hwclock --systohc --utc
 
 echo 'Set up the initial RAMdisk'
-mkinitcpio -p linux || exit 0
+mkinitcpio -p linux
 
 echo 'Ensure dhcpcd starts on boot'
 systemctl enable dhcpcd.service
