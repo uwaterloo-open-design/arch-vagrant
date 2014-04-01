@@ -42,6 +42,11 @@
       "scripts": [
         "scripts/provision.sh"
       ]
+    },
+    {
+      "type": "file",
+      "source": "keys/vagrant.pub",
+      "destination": "/mnt/home/vagrant/.ssh/authorized_keys"
     }
   ],
   "post-processors": [

@@ -53,4 +53,9 @@ mv /tmp/syslinux.cfg /boot/syslinux/syslinux.cfg
 
 echo 'add vagrant to the sudoers list'
 echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+echo 'ensure ssh is installed'
+pacman -S --noconfirm openssh
+systemctl enable sshd.service
+
 SCRIPT
