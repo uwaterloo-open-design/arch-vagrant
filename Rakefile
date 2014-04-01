@@ -17,3 +17,22 @@ namespace :iso do
     system "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso.sig -O templates/base.iso.sig"
   end
 end
+
+namespace :vagrant do
+  namespace :add do
+    task :raw do
+      system 'vagrant box add --force arch-raw-local boxes/arch-raw.box'
+    end
+  end
+
+  task :up, [:box] do |_, args|
+    system "vagrant up arch-#{args[:box]}"
+  end
+end
+
+namespace :packer do
+  task :gen do
+    system 'rm boxes/arch-raw.box'
+    system 'packer build -force archbox.json -o boxes/arch-raw.box'
+  end
+end
