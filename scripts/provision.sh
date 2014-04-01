@@ -48,6 +48,7 @@ pacman --noconfirm -S syslinux
 syslinux-install_update -i -a -m
 
 echo 'Fix syslinux config'
-sed s/sda3/sda1/ /boot/syslinux/syslinux.cfg | tee /boot/syslinux/syslinux.cfg
+sed s/sda3/sda2/ /boot/syslinux/syslinux.cfg > /tmp/syslinux.cfg
+mv /tmp/syslinux.cfg /boot/syslinux/syslinux.cfg
 
 SCRIPT
