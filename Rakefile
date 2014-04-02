@@ -44,7 +44,28 @@ namespace :vagrant do
   namespace :destroy do
     task :all do
       system 'rake vagrant:destroy[base]'
+      system 'rake vagrant:destroy[chef]'
+      system 'rake vagrant:destroy[puppet]'
     end
+  end
+
+  task :cycle, [:box] do |_, args|
+    system "rake vagrant:destroy[#{args[:box]}] vagrant:up[#{args[:box]}]"
+  end
+
+  task :export, [:box] do |_, args|
+    system "vagrant package arch-#{args[:box]} --output boxes/arch-#{args[:box]}"
+  end
+  namespace :export do
+    task :all do
+      system 'rake vagrant:export[base]'
+      system 'rake vagrant:export[chef]'
+      system 'rake vagrant:export[puppet]'
+    end
+  end
+
+  task :ssh, [:box] do |_, args|
+    system "vagrant ssh arch-#{args[:box]}"
   end
 end
 
