@@ -57,4 +57,14 @@ echo 'ensure ssh is installed'
 pacman -S --noconfirm openssh
 systemctl enable sshd.service
 
+echo 'set up the virtualbox guest additions'
+pacman -S --noconfirm virtualbox-guest-utils
+
+mkdir -p /etc/modules-load.d
+cat <<CONF>/etc/modules-load.d/virtualbox.conf
+vboxguest
+vboxsf
+vboxvideo
+CONF
+
 SCRIPT
