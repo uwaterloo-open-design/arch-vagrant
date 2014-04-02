@@ -38,7 +38,7 @@ mkdir /home/vagrant
 mkdir /home/vagrant/.ssh
 
 echo 'Fix permissions on vagrant keys.'
-chown -R vagrant /home/vagrant/.ssh/
+chown -R vagrant /home/vagrant/
 chmod 700 /home/vagrant/.ssh/
 chmod 600 /home/vagrant/.ssh/authorized_keys
 
