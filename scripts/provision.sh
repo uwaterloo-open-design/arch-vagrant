@@ -36,7 +36,6 @@ echo Create 'vagrant' user
 useradd vagrant
 mkdir /home/vagrant
 mkdir /home/vagrant/.ssh
-echo vagrant:vagrant | chpasswd
 
 echo 'Fix permissions on vagrant keys.'
 chown -R vagrant /home/vagrant/.ssh/
