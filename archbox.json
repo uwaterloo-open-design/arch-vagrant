@@ -52,8 +52,9 @@
   "post-processors": [
     {
       "type": "vagrant",
-      "output": "boxes/arch-raw.box",
-      "compression_level": 5
+      "output": "boxes/arch-base.box",
+      "compression_level": 8
     }
   ]
 }
+ 
