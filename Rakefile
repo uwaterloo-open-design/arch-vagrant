@@ -1,4 +1,5 @@
 require 'rubygems'
+require './lib/iso'
 
 namespace :iso do
   task :verify do
