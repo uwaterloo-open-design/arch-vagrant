@@ -1,85 +1,92 @@
 require 'rubygems'
+require 'aws-sdk'
 require './lib/iso'
 
-namespace :iso do
-  task :verify do
-    system 'gpg --verify templates/base.iso.sig templates/base.iso'
+load './aws-credentials'
+
+directory 'boxes'
+
+file FileList['scripts/*']
+file 'version'
+
+file 'archbox.json' => 'scripts/provision.sh'
+
+file 'boxes/arch-base.box' => ['boxes', 'archbox.json', 'version'] do
+  sh 'rm -f boxes/arch-base.box'
+  sh 'vagrant box remove arch-base-local'
+  sh 'packer build archbox.json'
+  sh 'vagrant box add arch-base-local boxes/arch-base.box'
+end
+
+rule %r{boxes/arch-.*\.box} => 'boxes/arch-base.box' do |t|
+  t.name =~ /arch-([^\.]*).box/
+  box = $1
+  sh %Q(
+    vagrant destroy -f arch-#{box}
+    vagrant --parallel up arch-#{box}
+    vagrant package --base arch-#{box} --output boxes/arch-#{box}.box
+    vagrant box add arch-#{box}-local boxes/arch-#{box}.box
+  )
+end
+
+task :ssh, [:box] do |_, args|
+  system "vagrant ssh arch-#{args[:box]}"
+end
+
+
+namespace :upload do
+  task :chef => 'boxes/arch-chef.box' do
+    Rake::Task[:"upload:go"].invoke("chef")
   end
 
-  task :md5 do
-    system 'md5sum --tag templates/base.iso'
+  task :puppet => 'boxes/arch-puppet.box' do
+    Rake::Task[:"upload:go"].invoke("puppet")
   end
 
-  task :download do
-    mirror = 'http://mirror.rit.edu/archlinux/iso'
-    date = '2014.03.01'
+  task :base => 'boxes/arch-base.box' do
+    Rake::Task[:"upload:go"].invoke("base")
+  end
+  task :go, [:box] do |_, args|
+    s3 = AWS::S3.new
+    bucket = s3.buckets['jgf-vagrantboxes']
 
-    system "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso     -O templates/base.iso"
-    system "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso.sig -O templates/base.iso.sig"
+    version = File.read('version')
+
+    box = args[:box]
+
+    obj = bucket.objects["archbox/v#{version}/arch-#{box}.box"]
+    obj.write(file: "boxes/arch-#{box}.box")
   end
 end
 
-namespace :vagrant do
-  namespace :add do
-    task :raw do
-      system 'vagrant box add --force arch-raw-local boxes/arch-raw.box'
-    end
-  end
-
-  namespace :rm do
-    task :raw do
-      system 'vagrant box remove arch-raw-local'
-    end
-  end
-
-  task :add => [:"vagrant:add:raw"]
-  task :rm => [:"vagrant:rm:raw"]
-
-  task :up, [:box] do |_, args|
-    system "vagrant up arch-#{args[:box]}"
-  end
-
-  task :destroy, [:box] do |_, args|
-    system "vagrant destroy -f arch-#{args[:box]}"
-  end
-  namespace :destroy do
-    task :all do
-      system 'rake vagrant:destroy[base]'
-      system 'rake vagrant:destroy[chef]'
-      system 'rake vagrant:destroy[puppet]'
-    end
-  end
-
-  task :cycle, [:box] do |_, args|
-    system "rake vagrant:destroy[#{args[:box]}] vagrant:up[#{args[:box]}]"
-  end
-
-  task :export, [:box] do |_, args|
-    system "vagrant package arch-#{args[:box]} --output boxes/arch-#{args[:box]}"
-  end
-  namespace :export do
-    task :all do
-      system 'rake vagrant:export[base]'
-      system 'rake vagrant:export[chef]'
-      system 'rake vagrant:export[puppet]'
-    end
-  end
-
-  task :ssh, [:box] do |_, args|
-    system "vagrant ssh arch-#{args[:box]}"
-  end
+desc 'upload the given box to S3'
+task :upload, [:box] do |_, args|
+  # This whole setup is so that running `rake upload[chef] will build and upload
+  # the chef box in one go.
+  Rake::Task[:"upload:#{args[:box]}"].invoke
 end
 
-namespace :packer do
-  task :gen do
-    system 'rm -f boxes/arch-raw.box'
-    system 'packer build archbox.json'
-  end
+file 'boxes/arch-chef.box' => ['scripts/chef.sh', 'boxes/arch-base.box']
+file 'boxes/arch-puppet.box' => ['scripts/puppet.sh', 'boxes/arch-base.box']
+
+task default: ['boxes/arch-chef.box', 'boxes/arch-puppet.box']
+
+multitask :clean do
+  sh %q(
+    vagrant destroy -f arch-base arch-chef arch-puppet
+  )
 end
 
-task :rebuild => [
-  :"vagrant:destroy:all",
-  :"vagrant:rm",
-  :"packer:gen",
-  :"vagrant:add"
-]
+multitask :boxclean => :clean do
+  sh %q(
+    vagrant box remove arch-base-local
+    vagrant box remove arch-chef-local
+    vagrant box remove arch-puppet-local
+  )
+end
+
+multitask :distclean => [:boxclean, :clean] do
+  sh %q(
+    rm boxes/arch-*.box
+  )
+end
