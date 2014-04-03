@@ -1,84 +1,28 @@
 require 'rubygems'
+require 'aws-sdk'
 
-namespace :iso do
-  task :verify do
-    system 'gpg --verify templates/base.iso.sig templates/base.iso'
-  end
+require './lib/iso'
+require './lib/rules'
+require './lib/upload'
+require './lib/helpers'
 
-  task :md5 do
-    system 'md5sum --tag templates/base.iso'
-  end
+# load the AWS credentials
+load './aws-credentials'
 
-  task :download do
-    mirror = 'http://mirror.rit.edu/archlinux/iso'
-    date = '2014.03.01'
+directory 'boxes'
+file FileList['scripts/*']
+file 'version'
 
-    system "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso     -O templates/base.iso"
-    system "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso.sig -O templates/base.iso.sig"
-  end
+file 'archbox.json' => 'scripts/provision.sh'
+
+file 'boxes/arch-base.box' => ['boxes', 'archbox.json', 'version', 'templates/base.iso'] do
+  sh 'rm -f boxes/arch-base.box'
+  sh 'vagrant box remove arch-base-local'
+  sh 'packer build archbox.json'
+  sh 'vagrant box add arch-base-local boxes/arch-base.box'
 end
 
-namespace :vagrant do
-  namespace :add do
-    task :raw do
-      system 'vagrant box add --force arch-raw-local boxes/arch-raw.box'
-    end
-  end
+file 'boxes/arch-chef.box' => ['scripts/chef.sh', 'boxes/arch-base.box']
+file 'boxes/arch-puppet.box' => ['scripts/puppet.sh', 'boxes/arch-base.box']
 
-  namespace :rm do
-    task :raw do
-      system 'vagrant box remove arch-raw-local'
-    end
-  end
-
-  task :add => [:"vagrant:add:raw"]
-  task :rm => [:"vagrant:rm:raw"]
-
-  task :up, [:box] do |_, args|
-    system "vagrant up arch-#{args[:box]}"
-  end
-
-  task :destroy, [:box] do |_, args|
-    system "vagrant destroy -f arch-#{args[:box]}"
-  end
-  namespace :destroy do
-    task :all do
-      system 'rake vagrant:destroy[base]'
-      system 'rake vagrant:destroy[chef]'
-      system 'rake vagrant:destroy[puppet]'
-    end
-  end
-
-  task :cycle, [:box] do |_, args|
-    system "rake vagrant:destroy[#{args[:box]}] vagrant:up[#{args[:box]}]"
-  end
-
-  task :export, [:box] do |_, args|
-    system "vagrant package arch-#{args[:box]} --output boxes/arch-#{args[:box]}"
-  end
-  namespace :export do
-    task :all do
-      system 'rake vagrant:export[base]'
-      system 'rake vagrant:export[chef]'
-      system 'rake vagrant:export[puppet]'
-    end
-  end
-
-  task :ssh, [:box] do |_, args|
-    system "vagrant ssh arch-#{args[:box]}"
-  end
-end
-
-namespace :packer do
-  task :gen do
-    system 'rm -f boxes/arch-raw.box'
-    system 'packer build archbox.json'
-  end
-end
-
-task :rebuild => [
-  :"vagrant:destroy:all",
-  :"vagrant:rm",
-  :"packer:gen",
-  :"vagrant:add"
-]
+task default: ['boxes/arch-chef.box', 'boxes/arch-puppet.box']
