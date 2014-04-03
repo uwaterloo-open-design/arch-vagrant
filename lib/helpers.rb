@@ -15,6 +15,7 @@ end
 multitask :distclean => [:boxclean, :clean] do
   sh %q(
     rm boxes/arch-*.box
+    rm templates/*
   )
 end
 
@@ -34,7 +35,7 @@ namespace :ssh do
   end
 
   task :go, [:box] do |_, args|
-    system "vagrant ssh arch-#{args[:box]}"
+    sh "vagrant ssh arch-#{args[:box]}"
   end
 end
 
@@ -59,7 +60,7 @@ namespace :up do
   end
 
   task :go, [:box] do |_, args|
-    system "vagrant up arch-#{args[:box]}"
+    sh "vagrant up arch-#{args[:box]}"
   end
 end
 
