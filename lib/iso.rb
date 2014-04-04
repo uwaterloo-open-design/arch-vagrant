@@ -19,8 +19,8 @@ namespace :iso do
     sh "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso.sig -O templates/base.iso.sig"
   end
 
-  multitask :verify => ['templates/base.iso', 'templates/base.iso.sig'] do
-    sh 'gpg --verify templates/base.iso.sig templates/base.iso'
+  file 'templates/verified' => ['templates/base.iso', 'templates/base.iso.sig'] do
+    sh 'gpg --verify templates/base.iso.sig templates/base.iso > templates/verified'
   end
 
   desc 'calculate the md5sum of the base.iso'
@@ -28,5 +28,6 @@ namespace :iso do
     sh 'md5sum --tag templates/base.iso'
   end
 end
+
 desc 'download and verify the base iso'
-task :iso => :'iso:verify'
+multitask :iso => :'templates/verified'
