@@ -27,4 +27,5 @@ end
 file 'boxes/arch-chef.box' => ['scripts/chef.sh', 'boxes/arch-base.box']
 file 'boxes/arch-puppet.box' => ['scripts/puppet.sh', 'boxes/arch-base.box']
 
+desc 'build the base, chef, and puppet vagrant boxes'
 task default: ['boxes/arch-chef.box', 'boxes/arch-puppet.box']
