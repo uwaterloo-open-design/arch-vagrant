@@ -9,13 +9,15 @@ require './lib/helpers'
 # load the AWS credentials
 load './aws-credentials'
 
+BASICS = ['boxes', 'archbox.json', 'scripts/provision.sh', 'templates/verified']
 directory 'boxes'
+
 file FileList['scripts/*']
 file 'version'
 
 file 'archbox.json' => 'scripts/provision.sh'
 
-file 'boxes/arch-base.box' => ['boxes', 'archbox.json', 'version', 'templates/base.iso'] do
+file 'boxes/arch-base.box' => BASICS do
   sh 'rm -f boxes/arch-base.box'
   sh 'vagrant box remove arch-base-local'
   sh 'packer build archbox.json'
