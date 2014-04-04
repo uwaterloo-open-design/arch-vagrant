@@ -19,7 +19,7 @@ file 'archbox.json' => 'scripts/provision.sh'
 
 file 'boxes/arch-base.box' => BASICS do
   sh 'rm -f boxes/arch-base.box'
-  sh 'vagrant box remove arch-base-local'
+  sh 'vagrant box remove arch-base-local || true'
   sh 'packer build archbox.json'
   sh 'vagrant box add arch-base-local boxes/arch-base.box'
 end
