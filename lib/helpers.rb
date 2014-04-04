@@ -1,15 +1,15 @@
+BOXES=[:chef,:puppet,:base,:'chef-local',:'puppet-local']
+
 multitask :clean do
-  sh %q(
-    vagrant destroy -f arch-base arch-chef arch-puppet
-  )
+  BOXES.each do |box|
+    sh %Q(vagrant destroy -f arch-#{box})
+  end
 end
 
 multitask :boxclean => :clean do
-  sh %q(
-    vagrant box remove arch-base-local
-    vagrant box remove arch-chef-local
-    vagrant box remove arch-puppet-local
-  )
+  BOXES.each do |box|
+    sh %Q(vagrant box remove arch-#{box})
+  end
 end
 
 multitask :distclean => [:boxclean, :clean] do
@@ -19,19 +19,13 @@ multitask :distclean => [:boxclean, :clean] do
   )
 end
 
+
 namespace :ssh do
   # these all assume the machine is up.
-
-  task :base => :"up:base" do |_, args|
-    Rake::Task[:"ssh:go"].invoke("base")
-  end
-
-  task :chef => :"up:chef" do |_, args|
-    Rake::Task[:"ssh:go"].invoke("chef")
-  end
-
-  task :puppet => :"up:puppet" do |_, args|
-    Rake::Task[:"ssh:go"].invoke("puppet")
+  BOXES.each do |box|
+    task box => :"up:#{box}" do |_, args|
+      Rake::Task[:'ssh:go'].invoke(box)
+    end
   end
 
   task :go, [:box] do |_, args|
@@ -41,22 +35,30 @@ end
 
 desc 'ssh into the given box'
 task :ssh, [:box] do |_, args|
-  Rake::Task[:"ssh:#{args[:box]}"].invoke("puppet")
+  Rake::Task[:"ssh:#{args[:box]}"].invoke('puppet')
 end
 
 namespace :up do
   # these all assume the machine is up.
 
   task :base => 'boxes/arch-base.box' do |_, args|
-    Rake::Task[:"up:go"].invoke("base")
+    Rake::Task[:'up:go'].invoke('base')
   end
 
   task :chef => 'boxes/arch-chef.box' do |_, args|
-    Rake::Task[:"up:go"].invoke("chef")
+    Rake::Task[:'up:go'].invoke('chef')
   end
 
   task :puppet => 'boxes/arch-puppet.box' do |_, args|
-    Rake::Task[:"up:go"].invoke("puppet")
+    Rake::Task[:'up:go'].invoke('puppet')
+  end
+
+  task :'puppet-local' => 'boxes/arch-puppet.box' do |_, args|
+    Rake::Task[:'up:go'].invoke('puppet-local')
+  end
+
+  task :'chef-local' => 'boxes/arch-chef.box' do |_, args|
+    Rake::Task[:'up:go'].invoke('chef-local')
   end
 
   task :go, [:box] do |_, args|

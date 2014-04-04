@@ -30,4 +30,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       shell.path = 'scripts/puppet.sh'
     end
   end
+
+  config.vm.define 'arch-chef-local' do |c|
+    c.vm.box = 'arch-chef-local'
+  end
+
+  config.vm.define 'arch-puppet-local' do |c|
+    c.vm.box = 'arch-puppet-local'
+  end
 end
