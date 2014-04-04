@@ -18,6 +18,4 @@ sudo pacman -S --noconfirm ruby git
 aur-install --noconfirm --needed -i ruby-bundler
 sudo aur-install --noconfirm --needed --asroot -i omnibus-chef || true
 
-sudo chef-installer
-
 echo 'export PATH=/opt/chef/bin:$PATH' > .bashrc
