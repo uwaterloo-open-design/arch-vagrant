@@ -7,6 +7,7 @@
     "iso_checksum": "d0c93ab40c4fd8959bfb5c7e5989c777",
     "iso_checksum_type": "md5",
     "ssh_username": "root",
+    "headless": true,
     "ssh_password": "",
     "ssh_wait_timeout": "50000s",
     "boot_wait": "5s",
@@ -34,13 +35,17 @@
         "yes<enter>",
         "q"
     ],
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--memory", "2048"],
+      ["modifyvm", "{{.Name}}", "--cpus", "4"]
+    ],
     "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now"
   }],
   "provisioners": [
     {
       "type": "shell",
       "scripts": [
-        "scripts/provision.sh"
+        "scripts/base.sh"
       ]
     },
     {
