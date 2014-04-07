@@ -1,23 +1,7 @@
-
 #!/usr/bin/env bash
 
-
-cat<<SCRIPT >/tmp/aur-install
-#!/bin/bash
-d=\${BUILDDIR:-\$PWD}
-for p in \${@##-*}; do
-  cd \$d
-  echo "Downloading \$p"
-  curl -s https://aur.archlinux.org/packages/\${p:0:2}/\$p/\$p.tar.gz -o \$p.tgz
-  tar xf \$p.tgz
-  cd \$p
-  makepkg -c --noprogressbar --noconfirm \${@##[^\-]*}
-done
-SCRIPT
-chmod a+x /tmp/aur-install
-sudo mv /tmp/aur-install /usr/local/bin/aur-install
-
 export BUILDDIR=/tmp
+export PATH=/usr/local/bin:$PATH
 
 sudo pacman -S --noconfirm ruby
 
