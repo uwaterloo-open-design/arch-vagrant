@@ -17,11 +17,12 @@ namespace :upload do
     s3 = AWS::S3.new
     bucket = s3.buckets['jgf-vagrantboxes']
 
-    version = File.read('version')
+    version = CONFIG['version']
+    date = CONFIG['iso']['date']
 
     box = args[:box]
 
-    obj = bucket.objects["archbox/v#{version}/arch-#{box}.box"]
+    obj = bucket.objects["archbox/v#{version}-#{date}/arch-#{box}.box"]
     obj.write(file: "boxes/arch-#{box}.box")
 
     puts "finished uploading #{args[:box]}"

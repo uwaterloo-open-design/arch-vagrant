@@ -1,0 +1,6 @@
+---
+
+version: '0.0.1'
+iso:
+  mirror: 'http://mirror.rit.edu/archlinux/iso'
+  date: '2014.03.01'

@@ -6,6 +6,7 @@ require './lib/upload'
 
 # load the AWS credentials
 load './aws-credentials'
+CONFIG = YAML.load_file('version.yml')
 
 def find_box_definition(box)
   box =~ %r{boxes/([^\.]*)\.box}
@@ -34,7 +35,7 @@ file 'scripts/puppet.sh'
 file 'scripts/base.sh'
 file 'scripts/aur-install.sh'
 
-PACKER_FILES = ['packer', 'version']
+PACKER_FILES = ['packer', 'version.yml']
 file 'packer/arch-chef.json'   => PACKER_FILES + ['scripts/chef.sh', 'scripts/aur-install.sh']
 file 'packer/arch-puppet.json' => PACKER_FILES + ['scripts/puppet.sh', 'scripts/aur-install.sh']
 file 'packer/arch-base.json'   => PACKER_FILES + ['scripts/base.sh', 'scripts/aur-install.sh']

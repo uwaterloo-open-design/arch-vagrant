@@ -1,22 +1,18 @@
 require 'rubygems'
 
 namespace :iso do
-  def mirror
-    'http://mirror.rit.edu/archlinux/iso'
-  end
-
-  def date
-    '2014.03.01'
+  def arch
+    "#{CONFIG['iso']['mirror']}/#{CONFIG['date']}/archlinux-#{CONFIG['date']}-dual"
   end
 
   directory 'templates'
 
   file 'templates/base.iso' => 'templates' do
-    sh "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso -O templates/base.iso"
+    sh "wget #{arch}.iso -O templates/base.iso"
   end
 
   file 'templates/base.iso.sig' => 'templates' do
-    sh "wget #{mirror}/#{date}/archlinux-#{date}-dual.iso.sig -O templates/base.iso.sig"
+    sh "wget #{arch}.iso.sig -O templates/base.iso.sig"
   end
 
   file 'templates/verified' => ['templates/base.iso', 'templates/base.iso.sig'] do
