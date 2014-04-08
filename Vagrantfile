@@ -10,32 +10,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define 'arch-base' do |c|
-    c.vm.box = 'arch-base-local'
+    c.vm.box = 'jfredett/arch-base'
   end
 
   config.vm.define 'arch-chef' do |c|
-    c.vm.box = 'arch-base-local'
-
-    c.vm.provision :shell do |shell|
-      shell.privileged = false
-      shell.path = 'scripts/chef.sh'
-    end
+    c.vm.box = 'jfredett/arch-chef'
   end
 
   config.vm.define 'arch-puppet' do |c|
-    c.vm.box = 'arch-base-local'
-
-    c.vm.provision :shell do |shell|
-      shell.privileged = false
-      shell.path = 'scripts/puppet.sh'
-    end
+    c.vm.box = 'jfredett/arch-puppet'
   end
 
-  config.vm.define 'arch-chef-local' do |c|
-    c.vm.box = 'arch-chef-local'
-  end
-
-  config.vm.define 'arch-puppet-local' do |c|
-    c.vm.box = 'arch-puppet-local'
-  end
 end
