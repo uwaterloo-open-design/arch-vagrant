@@ -28,7 +28,7 @@ namespace :upload do
     puts "finished uploading #{args[:box]}"
   end
 
-  task :all => ['upload[base]', 'upload[chef]', 'upload[puppet]']
+  task :all => [:base, :puppet, :chef]
 end
 
 desc 'upload the given box to S3'
