@@ -2,9 +2,9 @@
   "variables": {},
   "builders": [{
     "type": "virtualbox-ovf",
+    "headless": true,
     "source_path": "boxes/arch-base.ovf",
     "ssh_username": "vagrant",
-    "headless": false,
     "ssh_key_path": "keys/vagrant",
     "ssh_wait_timeout": "50000s",
     "boot_wait": "10s",
