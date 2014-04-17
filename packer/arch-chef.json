@@ -36,8 +36,7 @@
     {
       "type": "vagrant",
       "output": "boxes/arch-chef.box",
-      "compression_level": 8
+      "compression_level": 9
     }
   ]
 }
- 
