@@ -1,8 +1,6 @@
 require 'rubygems'
 require 'aws-sdk'
 
-require './lib/iso'
-require './lib/upload'
 
 # load the AWS credentials
 load './aws-credentials'
@@ -15,11 +13,19 @@ end
 
 CLEAN = FileList.new
 DIST  = FileList.new
+NUKE  = FileList.new
+
+require './lib/iso'
+require './lib/upload'
+
 task :clean do
   sh "rm -rf #{CLEAN}"
 end
 task :distclean => :clean do
   sh "rm -rf #{DIST}"
+end
+task :nuke => :distclean do
+  sh "rm -rf #{NUKE}"
 end
 
 directory 'boxes'
