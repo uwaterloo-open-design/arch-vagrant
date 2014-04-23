@@ -6,3 +6,4 @@ boxes/
 .vagrant/
 aws-credentials
 templates/verified
+.bundle/
