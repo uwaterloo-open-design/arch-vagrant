@@ -1,5 +1,5 @@
 #!/bin/bash
-d=${BUILDDIR:-\$PWD}
+d=${BUILDDIR:-$PWD}
 for p in ${@##-*}; do
   echo "####### BUILDING $p ###########"
   cd $d

@@ -1,8 +1,6 @@
 require 'rubygems'
 require 'aws-sdk'
 
-require './lib/iso'
-require './lib/upload'
 
 # load the AWS credentials
 load './aws-credentials'
@@ -15,11 +13,19 @@ end
 
 CLEAN = FileList.new
 DIST  = FileList.new
+NUKE  = FileList.new
+
+require './lib/iso'
+require './lib/upload'
+
 task :clean do
   sh "rm -rf #{CLEAN}"
 end
 task :distclean => :clean do
   sh "rm -rf #{DIST}"
+end
+task :nuke => :distclean do
+  sh "rm -rf #{NUKE}"
 end
 
 directory 'boxes'
@@ -38,7 +44,7 @@ file 'scripts/aur-install.sh'
 PACKER_FILES = ['packer', 'version.yml']
 file 'packer/arch-chef.json'   => PACKER_FILES + ['scripts/chef.sh', 'scripts/aur-install.sh']
 file 'packer/arch-puppet.json' => PACKER_FILES + ['scripts/puppet.sh', 'scripts/aur-install.sh']
-file 'packer/arch-base.json'   => PACKER_FILES + ['scripts/base.sh', 'scripts/aur-install.sh']
+file 'packer/arch-base.json'   => PACKER_FILES + ['scripts/base.sh', 'scripts/aur-install.sh', 'templates/verified']
 
 rule %r{packer/[^\.]*\.json} do |t|
   sh "touch #{t.name}" # update this file if any of it's dependencies update
@@ -67,6 +73,6 @@ file 'boxes/packer-virtualbox-iso-disk1.vmdk' => 'boxes/arch-base.box' do
 end
 
 file 'boxes/arch-chef.box' => OVF_FILES + ['packer/arch-chef.json']
-file 'boxes/arch-puppet.box' => OVF_FILES
+file 'boxes/arch-puppet.box' => OVF_FILES + ['packer/arch-puppet.json']
 
 task default: ['boxes/arch-chef.box', 'boxes/arch-puppet.box']
