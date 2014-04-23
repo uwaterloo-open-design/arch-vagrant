@@ -4,11 +4,10 @@ export BUILDDIR=/tmp
 export PATH=/usr/local/bin:$PATH
 
 sudo pacman -S --noconfirm ruby git base-devel
-aur-install -i ruby-bundler
-sudo aur-install --asroot --noconfirm omnibus-chef-git
+aur-install --noconfirm -i ruby-bundler
+sudo aur-install --asroot --noconfirm -f omnibus-chef-git
 
-
-# running w/ -i will result in a confirmation screen. No bueno.
-/usr/local/sbin/chef-installer
-
-echo 'export PATH=/opt/chef/bin:$PATH' > /home/vagrant/.bash_profile
+# set up /etc/profile w/ the fixed PATH
+cp /etc/profile /tmp/profile
+echo 'export "PATH=/opt/chef/bin:$PATH"' >> /tmp/profile
+sudo mv /tmp/profile /etc/profile
